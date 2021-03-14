@@ -222,64 +222,66 @@ void OscvstAudioProcessor::setStateInformation(const void* data, int sizeInBytes
 	if (xmlState.get() != nullptr)
 	{
 		if (xmlState->hasTagName(paramsState.state.getType()))
+		{
 			paramsState.replaceState(ValueTree::fromXml(*xmlState));
 
-		// OSC SETTINGS
-		{
-			const auto& oscSettingsTree = paramsState.state.getChildWithName("oscSettings");
-			if (oscSettingsTree.isValid())
+			// OSC SETTINGS
 			{
-				osc.address = oscSettingsTree["address"];
-				osc.port = oscSettingsTree["port"];
-				osc.interval = oscSettingsTree["interval"];
-				osc.sender.disconnect();
-				osc.sender.connect(osc.address, osc.port);
-				startTimer(std::max(osc.interval, 1));
-			}
-		}
-
-		// OSC MAP
-		{
-			oscMap.clear();
-			const auto& oscMapTree = paramsState.state.getChildWithName("oscMap");
-			if (oscMapTree.isValid())
-			{
-				for (int i = 0; i < oscMapTree.getNumChildren(); ++i)
+				const auto& oscSettingsTree = paramsState.state.getChildWithName("oscSettings");
+				if (oscSettingsTree.isValid())
 				{
-					// OSC OBJECT
-					const auto& oscObjectTree = oscMapTree.getChild(i);
-					if (oscObjectTree.isValid())
+					osc.address = oscSettingsTree["address"];
+					osc.port = oscSettingsTree["port"];
+					osc.interval = oscSettingsTree["interval"];
+					osc.sender.disconnect();
+					osc.sender.connect(osc.address, osc.port);
+					startTimer(std::max(osc.interval, 1));
+				}
+			}
+
+			// OSC MAP
+			{
+				oscMap.clear();
+				const auto& oscMapTree = paramsState.state.getChildWithName("oscMap");
+				if (oscMapTree.isValid())
+				{
+					for (int i = 0; i < oscMapTree.getNumChildren(); ++i)
 					{
-						const String& path = oscObjectTree["path"];
-						const int note = oscObjectTree["note"];
-						OscObject* oscObject = addOscObject(note, path);
-						if (oscObject)
+						// OSC OBJECT
+						const auto& oscObjectTree = oscMapTree.getChild(i);
+						if (oscObjectTree.isValid())
 						{
-							oscObject->useNote = oscObjectTree["useNote"];
-							oscObject->useVel = oscObjectTree["useVel"];
-
-							// RANDOM RANGE
+							const String& path = oscObjectTree["path"];
+							const int note = oscObjectTree["note"];
+							OscObject* oscObject = addOscObject(note, path);
+							if (oscObject)
 							{
-								const auto& rangeTree = oscObjectTree.getChildWithName("randomRange");
-								if (rangeTree.isValid())
+								oscObject->useNote = oscObjectTree["useNote"];
+								oscObject->useVel = oscObjectTree["useVel"];
+
+								// RANDOM RANGE
 								{
-									oscObject->randomRange.inUse = rangeTree.getProperty("inUse");
-									oscObject->randomRange.isInt = rangeTree.getProperty("isInt");
-									oscObject->randomRange.range.setStart(rangeTree.getProperty("lo"));
-									oscObject->randomRange.range.setEnd(rangeTree.getProperty("hi"));
+									const auto& rangeTree = oscObjectTree.getChildWithName("randomRange");
+									if (rangeTree.isValid())
+									{
+										oscObject->randomRange.inUse = rangeTree.getProperty("inUse");
+										oscObject->randomRange.isInt = rangeTree.getProperty("isInt");
+										oscObject->randomRange.range.setStart(rangeTree.getProperty("lo"));
+										oscObject->randomRange.range.setEnd(rangeTree.getProperty("hi"));
+									}
 								}
-							}
 
-							// KNOB RANGES
-							for (int i = 0; i < 16; ++i)
-							{
-								const auto& rangeTree = oscObjectTree.getChildWithName(String("knob") + String(i + 1));
-								if (rangeTree.isValid())
+								// KNOB RANGES
+								for (int i = 0; i < 16; ++i)
 								{
-									oscObject->knobRanges[i].inUse = rangeTree.getProperty("inUse");
-									oscObject->knobRanges[i].isInt = rangeTree.getProperty("isInt");
-									oscObject->knobRanges[i].range.setStart(rangeTree.getProperty("lo"));
-									oscObject->knobRanges[i].range.setEnd(rangeTree.getProperty("hi"));
+									const auto& rangeTree = oscObjectTree.getChildWithName(String("knob") + String(i + 1));
+									if (rangeTree.isValid())
+									{
+										oscObject->knobRanges[i].inUse = rangeTree.getProperty("inUse");
+										oscObject->knobRanges[i].isInt = rangeTree.getProperty("isInt");
+										oscObject->knobRanges[i].range.setStart(rangeTree.getProperty("lo"));
+										oscObject->knobRanges[i].range.setEnd(rangeTree.getProperty("hi"));
+									}
 								}
 							}
 						}
@@ -287,7 +289,6 @@ void OscvstAudioProcessor::setStateInformation(const void* data, int sizeInBytes
 				}
 			}
 		}
-
 	}
 
 	if (onStateLoadedCallback) onStateLoadedCallback();

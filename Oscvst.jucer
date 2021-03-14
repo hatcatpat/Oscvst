@@ -3,7 +3,9 @@
 <JUCERPROJECT id="SPZo1t" name="Oscvst" projectType="audioplug" useAppConfig="1"
               addUsingNamespaceToJuceHeader="1" displaySplashScreen="1" jucerFormatVersion="1"
               pluginFormats="buildStandalone,buildVST3" pluginCharacteristicsValue="pluginWantsMidiIn"
-              pluginVST3Category="Instrument">
+              pluginVST3Category="Instrument" pluginDesc="A VST plugin for sending OSC messages"
+              pluginManufacturer="pat" pluginName="oscvst" bundleIdentifier="pat.oscvst"
+              splashScreenColour="Light" companyName="pat" companyWebsite="https://github.com/hatcatpat">
   <MAINGROUP id="ygzlUK" name="Oscvst">
     <GROUP id="{3C3FC97C-4C7B-5FF4-9A7E-FAE27D69A5D8}" name="Source">
       <FILE id="KJ0Krx" name="SettingsMenuComponent.h" compile="0" resource="0"
